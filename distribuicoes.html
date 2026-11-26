@@ -1,0 +1,2731 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Distribuições e Normalidade | BioStat Lab</title>
+
+<style>
+
+:root {
+  --primary: #125b63;
+  --green: #178579;
+  --blue: #426fa9;
+  --orange: #a66b13;
+  --background: #f5f8fa;
+  --border: #dce5e9;
+  --text: #20333e;
+  --muted: #536773;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--text);
+  font: 16px/1.55 system-ui, sans-serif;
+}
+
+header {
+  background: white;
+  border-bottom: 1px solid var(--border);
+}
+
+header > div, main {
+  max-width: 1180px;
+  margin: auto;
+  padding: 20px;
+}
+
+a {
+  color: var(--primary);
+}
+
+h1, h2, h3 {
+  color: var(--primary);
+}
+
+h1 {
+  margin-bottom: 4px;
+}
+
+h2 {
+  font-size: 21px;
+  margin-top: 0;
+}
+
+h3 {
+  font-size: 17px;
+}
+
+p {
+  margin: 8px 0 16px;
+}
+
+.muted, small {
+  color: var(--muted);
+}
+
+.card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 18px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+}
+
+select, input, textarea, button {
+  font: inherit;
+}
+
+select, input[type="number"], textarea {
+  border: 1px solid #9bafb6;
+  border-radius: 7px;
+  padding: 9px;
+  max-width: 100%;
+  background: white;
+  color: var(--text);
+}
+
+input[type="range"] {
+  accent-color: var(--green);
+  width: 100%;
+}
+
+textarea {
+  width: 100%;
+  min-height: 130px;
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: 1px solid var(--primary);
+  border-radius: 7px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: white;
+  color: var(--primary);
+}
+
+button:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+button:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: 3px solid #d28c25;
+  outline-offset: 3px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+  gap: 12px;
+  margin: 18px 0;
+}
+
+.metric {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px;
+  background: #f8fbfc;
+}
+
+.metric span {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.metric strong {
+  display: block;
+  font-size: 23px;
+  color: var(--primary);
+  margin-top: 4px;
+}
+
+.chart {
+  min-width: 0;
+  margin: 15px 0;
+}
+
+svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.note {
+  background: #edf6f5;
+  border-left: 4px solid var(--green);
+  padding: 14px;
+  border-radius: 5px;
+  margin: 15px 0;
+}
+
+.warning {
+  background: #fff7e9;
+  border-left: 4px solid var(--orange);
+  padding: 14px;
+  border-radius: 5px;
+  margin: 15px 0;
+}
+
+.challenge {
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+details p {
+  margin: 12px 0 0;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 14px;
+}
+
+td, th {
+  padding: 10px 6px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+td:not(:first-child),
+th:not(:first-child) {
+  text-align: right;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.navigation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.navigation a {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 12px;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+footer {
+  padding: 25px;
+  text-align: center;
+  color: var(--muted);
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@media (max-width: 760px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  main {
+    padding: 12px;
+  }
+
+  h1 {
+    font-size: 27px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    scroll-behavior: auto;
+  }
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+  <div>
+    <a href="index.html">← BioStat Lab</a>
+  </div>
+</header>
+
+<main>
+
+<h1>Distribuições e Normalidade</h1>
+
+<p class="muted">
+  Explore a forma das distribuições, investigue a normalidade
+  e compreenda o Teorema Central do Limite.
+</p>
+
+<div class="navigation">
+  <a href="#dados">1. Dados</a>
+  <a href="#distribuicao">2. Distribuições</a>
+  <a href="#normal">3. Curva normal</a>
+  <a href="#normalidade">4. Normalidade</a>
+  <a href="#transformacao">5. Transformação</a>
+  <a href="#tcl">6. Teorema Central do Limite</a>
+  <a href="#desafios">7. Desafios</a>
+</div>
+
+<!-- CONFIGURAÇÃO DOS DADOS -->
+
+<section class="card" id="dados">
+
+<h2>1. Configure a população</h2>
+
+<p>
+  Escolha uma população simulada, explore dados reais
+  ou utilize valores coletados em sala de aula.
+</p>
+
+<div class="controls">
+
+<label>
+  Fonte dos dados
+  <br>
+  <select id="source">
+    <option value="simulated">Dados simulados</option>
+    <option value="pns">PNS 2019</option>
+    <option value="custom">Dados próprios</option>
+  </select>
+</label>
+
+<label id="distributionControl">
+  Distribuição
+  <br>
+  <select id="distribution">
+    <option value="normal">Normal</option>
+    <option value="right">Assimétrica à direita</option>
+    <option value="left">Assimétrica à esquerda</option>
+    <option value="uniform">Uniforme</option>
+    <option value="bimodal">Bimodal</option>
+    <option value="heavy">Caudas pesadas</option>
+  </select>
+</label>
+
+<label id="variableControl" hidden>
+  Variável
+  <br>
+  <select id="variable">
+    <option value="altura">Altura (cm)</option>
+    <option value="peso">Peso (kg)</option>
+    <option value="idade">Idade (anos)</option>
+    <option value="imc">IMC (kg/m²)</option>
+    <option value="renda_per_capita">Renda per capita (R$)</option>
+  </select>
+</label>
+
+<label id="sexControl" hidden>
+  Sexo
+  <br>
+  <select id="sex">
+    <option value="all">Todos</option>
+    <option value="1">Masculino</option>
+    <option value="2">Feminino</option>
+  </select>
+</label>
+
+<label id="sizeControl">
+  Tamanho máximo da população
+  <br>
+  <select id="populationSize">
+    <option value="50">50</option>
+    <option value="100">100</option>
+    <option value="200">200</option>
+    <option value="500">500</option>
+    <option value="1000" selected>1000</option>
+  </select>
+</label>
+
+<button id="generate">Gerar nova população</button>
+
+</div>
+
+<div id="customControl" hidden>
+
+<label for="customValues">
+  Insira um valor por linha:
+</label>
+
+<textarea id="customValues"
+placeholder="165&#10;172,5&#10;158&#10;169&#10;181"></textarea>
+
+<button id="applyCustom">Utilizar estes dados</button>
+
+<p class="muted">
+  Utilize vírgula ou ponto como separador decimal.
+  Não insira nomes ou informações identificáveis.
+  Os dados permanecem apenas nesta página.
+</p>
+
+</div>
+
+<div id="populationInfo" class="note" aria-live="polite"></div>
+
+<p id="dataError" role="alert"></p>
+
+</section>
+
+<!-- DISTRIBUIÇÕES -->
+
+<section class="card" id="distribuicao">
+
+<h2>2. Explore a distribuição dos dados</h2>
+
+<p>
+  Observe a concentração dos valores, a dispersão,
+  a simetria e a presença de valores extremos.
+</p>
+
+<div class="controls">
+
+<label>
+  Número de classes:
+  <span id="binsValue">20</span>
+  <input id="bins" type="range" min="5" max="50" value="20">
+</label>
+
+<label>
+  <input id="showNormal" type="checkbox" checked>
+  Sobrepor curva normal ajustada
+</label>
+
+<label>
+  <input id="showMean" type="checkbox" checked>
+  Mostrar média
+</label>
+
+<label>
+  <input id="showMedian" type="checkbox" checked>
+  Mostrar mediana
+</label>
+
+</div>
+
+<div class="metrics" id="descriptiveMetrics"></div>
+
+<div class="chart" id="populationChart"></div>
+
+<p class="muted">
+  Barras verdes: frequência observada.
+  Curva azul: distribuição normal ajustada aos dados.
+  Linha laranja tracejada: média.
+  Linha roxa pontilhada: mediana.
+</p>
+
+<div class="note" id="shapeInterpretation"></div>
+
+<details>
+<summary>Como interpretar a assimetria e a curtose?</summary>
+
+<p>
+  A assimetria descreve a falta de simetria de uma distribuição.
+  Valores positivos indicam tendência a uma cauda mais longa
+  à direita; valores negativos indicam tendência à esquerda.
+</p>
+
+<p>
+  O excesso de curtose está relacionado ao peso das caudas
+  e à contribuição de observações extremas.
+  Na distribuição normal teórica, seu valor é zero.
+</p>
+
+<p>
+  Assimetria próxima de zero não comprova normalidade.
+  Distribuições uniformes e bimodais também podem ser simétricas.
+</p>
+
+</details>
+
+</section>
+
+<!-- CURVA NORMAL -->
+
+<section class="card" id="normal">
+
+<h2>3. Laboratório da curva normal</h2>
+
+<p>
+  Altere a média e o desvio padrão de uma distribuição normal
+  teórica. Observe como a curva se modifica.
+</p>
+
+<div class="grid">
+
+<div>
+
+<label>
+  Média (μ):
+  <span id="normalMeanValue">100</span>
+  <input type="range" id="normalMean"
+         min="60" max="140" value="100">
+</label>
+
+<label>
+  Desvio padrão (σ):
+  <span id="normalSDValue">15</span>
+  <input type="range" id="normalSD"
+         min="3" max="30" value="15">
+</label>
+
+<label>
+  Região destacada
+  <br>
+  <select id="normalRegion">
+    <option value="1">Média ± 1 DP</option>
+    <option value="2">Média ± 2 DP</option>
+    <option value="3">Média ± 3 DP</option>
+  </select>
+</label>
+
+<div class="metrics" id="normalMetrics"></div>
+
+</div>
+
+<div>
+
+<div class="chart" id="normalChart"></div>
+
+</div>
+
+</div>
+
+<div class="note">
+
+<strong>Regra empírica da distribuição normal</strong>
+
+<p>
+  Aproximadamente 68,27% dos valores encontram-se a até
+  um desvio padrão da média; 95,45% a até dois desvios padrão;
+  e 99,73% a até três desvios padrão.
+</p>
+
+<p>
+  Essas proporções descrevem uma distribuição normal teórica.
+  Não correspondem automaticamente a intervalos de confiança.
+</p>
+
+</div>
+
+</section>
+
+<!-- NORMALIDADE -->
+
+<section class="card" id="normalidade">
+
+<h2>4. Avalie a normalidade</h2>
+
+<p>
+  Utilize conjuntamente a avaliação visual,
+  as medidas de forma e o teste estatístico.
+</p>
+
+<div class="grid">
+
+<div>
+
+<h3>Histograma e curva normal ajustada</h3>
+
+<div class="chart" id="normalityHistogram"></div>
+
+</div>
+
+<div>
+
+<h3>Gráfico Q-Q</h3>
+
+<div class="chart" id="qqChart"></div>
+
+<p class="muted">
+  Quanto mais próximos os pontos estiverem da linha de referência,
+  maior a compatibilidade visual com a distribuição normal.
+</p>
+
+</div>
+
+</div>
+
+<h3>Teste de Shapiro-Wilk</h3>
+
+<div class="warning">
+  Implementação experimental do algoritmo aproximado de
+  Shapiro-Wilk (Royston). Os resultados ainda não foram
+  validados independentemente contra um software estatístico.
+  Utilize-os apenas para exploração didática preliminar.
+</div>
+
+<div class="controls">
+
+<label>
+  Nível de significância
+  <br>
+  <select id="alpha">
+    <option value="0.01">1%</option>
+    <option value="0.05" selected>5%</option>
+    <option value="0.10">10%</option>
+  </select>
+</label>
+
+<button id="runNormality">Calcular teste</button>
+
+</div>
+
+<div class="metrics" id="normalityMetrics"></div>
+
+<div class="note" id="normalityInterpretation">
+  Clique em calcular teste para explorar os resultados.
+</div>
+
+<h3>Regra empírica: observado versus esperado</h3>
+
+<div class="table-scroll">
+
+<table>
+<thead>
+<tr>
+  <th>Intervalo</th>
+  <th>Observado</th>
+  <th>Normal teórica</th>
+</tr>
+</thead>
+<tbody id="empiricalTable"></tbody>
+</table>
+
+</div>
+
+<div class="warning">
+  Não rejeitar a hipótese de normalidade não significa
+  comprovar que os dados seguem uma distribuição normal.
+  Em amostras grandes, pequenos desvios podem produzir
+  resultados estatisticamente significativos.
+</div>
+
+</section>
+
+<!-- TRANSFORMAÇÃO -->
+
+<section class="card" id="transformacao">
+
+<h2>5. Experimente uma transformação logarítmica</h2>
+
+<p>
+  Transformações podem modificar a forma de uma distribuição.
+  Explore especialmente a variável renda per capita da PNS.
+</p>
+
+<div class="controls">
+
+<label>
+  Transformação
+  <br>
+  <select id="transformation">
+    <option value="log1p">ln(1 + x)</option>
+    <option value="log">ln(x)</option>
+    <option value="sqrt">Raiz quadrada</option>
+  </select>
+</label>
+
+<button id="transform">Comparar distribuições</button>
+
+</div>
+
+<div class="grid">
+
+<div>
+
+<h3>Dados originais</h3>
+
+<div class="chart" id="originalChart"></div>
+
+<div id="originalStats"></div>
+
+</div>
+
+<div>
+
+<h3>Dados transformados</h3>
+
+<div class="chart" id="transformedChart"></div>
+
+<div id="transformedStats"></div>
+
+</div>
+
+</div>
+
+<p id="transformInfo" aria-live="polite"></p>
+
+<div class="note">
+  Uma transformação modifica a escala dos dados.
+  Reduzir a assimetria não garante normalidade.
+  A escolha da transformação deve considerar o objetivo
+  da análise e a interpretação da variável.
+</div>
+
+</section>
+
+<!-- TEOREMA CENTRAL DO LIMITE -->
+
+<section class="card" id="tcl">
+
+<h2>6. Teorema Central do Limite</h2>
+
+<p>
+  O que acontece com a distribuição das médias amostrais
+  quando aumentamos o tamanho das amostras?
+</p>
+
+<div class="note">
+
+<strong>Antes de executar, faça uma previsão.</strong>
+
+<p>
+  Se a população for assimétrica, as médias amostrais
+  também serão assimétricas? O que acontece quando
+  aumentamos o tamanho amostral?
+</p>
+
+</div>
+
+<div class="controls">
+
+<label>
+  Amostra A (n)
+  <br>
+  <input id="sampleA" type="number" min="1" value="5">
+</label>
+
+<label>
+  Amostra B (n)
+  <br>
+  <input id="sampleB" type="number" min="1" value="30">
+</label>
+
+<label>
+  Amostra C (n)
+  <br>
+  <input id="sampleC" type="number" min="1" value="100">
+</label>
+
+<label>
+  Repetições por tamanho
+  <br>
+  <select id="repetitions">
+    <option value="100">100</option>
+    <option value="500">500</option>
+    <option value="1000" selected>1000</option>
+    <option value="5000">5000</option>
+  </select>
+</label>
+
+<label>
+  Método de amostragem
+  <br>
+  <select id="samplingMethod">
+    <option value="replacement">Com reposição</option>
+    <option value="without">Sem reposição</option>
+  </select>
+</label>
+
+<label>
+  Escala horizontal
+  <br>
+  <select id="samplingScale">
+    <option value="common">Comum aos quatro gráficos</option>
+    <option value="zoom">Ajustada a cada gráfico</option>
+  </select>
+</label>
+
+<button id="runTCL">Executar experimento</button>
+
+</div>
+
+<p id="tclStatus" aria-live="polite"></p>
+
+<div class="grid">
+
+<div>
+
+<h3>População: valores individuais</h3>
+
+<div class="chart" id="tclPopulation"></div>
+
+<p id="tclPopulationInfo"></p>
+
+</div>
+
+<div>
+
+<h3 id="titleA">Distribuição das médias — A</h3>
+
+<div class="chart" id="tclA"></div>
+
+<p id="infoA"></p>
+
+</div>
+
+<div>
+
+<h3 id="titleB">Distribuição das médias — B</h3>
+
+<div class="chart" id="tclB"></div>
+
+<p id="infoB"></p>
+
+</div>
+
+<div>
+
+<h3 id="titleC">Distribuição das médias — C</h3>
+
+<div class="chart" id="tclC"></div>
+
+<p id="infoC"></p>
+
+</div>
+
+</div>
+
+<h3>Desvio padrão versus erro padrão</h3>
+
+<div class="table-scroll">
+
+<table>
+
+<thead>
+<tr>
+  <th>Tamanho amostral</th>
+  <th>Média das médias</th>
+  <th>Erro padrão observado</th>
+  <th>Erro padrão teórico</th>
+</tr>
+</thead>
+
+<tbody id="tclTable"></tbody>
+
+</table>
+
+</div>
+
+<div class="chart" id="seChart"></div>
+
+<div class="note">
+
+<strong>O que o Teorema Central do Limite nos ensina?</strong>
+
+<p>
+  Sob condições apropriadas, a distribuição das médias
+  amostrais tende a se aproximar de uma distribuição normal
+  à medida que o tamanho amostral aumenta.
+</p>
+
+<p>
+  Os dados individuais não se tornam normais.
+  O que pode se aproximar da normalidade é a distribuição
+  das médias de amostras repetidas.
+</p>
+
+<p>
+  Não existe um tamanho amostral universal que garanta
+  essa aproximação. O resultado depende, entre outros fatores,
+  da forma da população e do método de amostragem.
+</p>
+
+</div>
+
+<details>
+
+<summary>Como o erro padrão é calculado?</summary>
+
+<p>
+  Com reposição, o erro padrão teórico da média é:
+</p>
+
+<p><strong>EP = σ / √n</strong></p>
+
+<p>
+  σ representa o desvio padrão populacional,
+  calculado com denominador N.
+</p>
+
+<p>
+  Na amostragem aleatória simples sem reposição,
+  considerando uma população finita:
+</p>
+
+<p>
+  <strong>EP = S / √n × √(1 − n/N)</strong>
+</p>
+
+<p>
+  Nesse caso, S é o desvio padrão da população calculado
+  com denominador N − 1.
+</p>
+
+<p>
+  Quando n = N, sem reposição, todas as amostras
+  correspondem à população inteira e o erro padrão é zero.
+</p>
+
+</details>
+
+</section>
+
+<!-- DESAFIOS -->
+
+<section class="card" id="desafios">
+
+<h2>7. Desafios de aprendizagem</h2>
+
+<div class="challenge">
+
+<details>
+<summary>
+  Desafio 1 — Toda distribuição simétrica é normal?
+</summary>
+
+<p>
+  Compare as distribuições normal, uniforme e bimodal.
+  Observe a assimetria, o histograma e o gráfico Q-Q.
+</p>
+
+<p>
+  <strong>Resposta esperada:</strong>
+  não. A simetria é uma característica da distribuição normal,
+  mas não é suficiente para caracterizá-la.
+</p>
+
+</details>
+
+</div>
+
+<div class="challenge">
+
+<details>
+<summary>
+  Desafio 2 — A altura segue uma distribuição normal?
+</summary>
+
+<p>
+  Selecione altura na PNS. Compare todos os indivíduos
+  com os grupos masculino e feminino separadamente.
+</p>
+
+<p>
+  <strong>Resposta esperada:</strong>
+  a combinação de subgrupos com médias diferentes
+  pode modificar a forma da distribuição.
+  A normalidade deve ser avaliada em cada conjunto.
+</p>
+
+</details>
+
+</div>
+
+<div class="challenge">
+
+<details>
+<summary>
+  Desafio 3 — Média ou mediana?
+</summary>
+
+<p>
+  Selecione renda per capita na PNS.
+  Compare a média com a mediana.
+</p>
+
+<p>
+  <strong>Resposta esperada:</strong>
+  valores muito elevados podem deslocar a média para cima.
+  A mediana é menos sensível a valores extremos.
+</p>
+
+</details>
+
+</div>
+
+<div class="challenge">
+
+<details>
+<summary>
+  Desafio 4 — Uma transformação garante normalidade?
+</summary>
+
+<p>
+  Aplique uma transformação logarítmica à renda
+  e compare os histogramas.
+</p>
+
+<p>
+  <strong>Resposta esperada:</strong>
+  não. A transformação pode reduzir a assimetria,
+  mas não garante uma distribuição normal.
+</p>
+
+</details>
+
+</div>
+
+<div class="challenge">
+
+<details>
+<summary>
+  Desafio 5 — Uma população assimétrica pode produzir
+  médias aproximadamente normais?
+</summary>
+
+<p>
+  Selecione uma distribuição assimétrica à direita.
+  Execute o experimento do Teorema Central do Limite
+  com n = 5, 30 e 100.
+</p>
+
+<p>
+  <strong>Resposta esperada:</strong>
+  a distribuição das médias pode se aproximar da normalidade
+  à medida que o tamanho amostral aumenta.
+</p>
+
+</details>
+
+</div>
+
+<div class="challenge">
+
+<details>
+<summary>
+  Desafio 6 — Desvio padrão e erro padrão são iguais?
+</summary>
+
+<p>
+  Compare o desvio padrão populacional com os erros padrão
+  observados para diferentes tamanhos amostrais.
+</p>
+
+<p>
+  <strong>Resposta esperada:</strong>
+  o desvio padrão descreve a dispersão dos valores individuais.
+  O erro padrão da média descreve a variabilidade
+  das médias amostrais.
+</p>
+
+</details>
+
+</div>
+
+<div class="challenge">
+
+<details>
+<summary>
+  Desafio 7 — O que acontece quando n = N?
+</summary>
+
+<p>
+  Selecione uma população de 100 indivíduos.
+  Utilize amostragem sem reposição e n = 100.
+</p>
+
+<p>
+  <strong>Resposta esperada:</strong>
+  todas as médias serão iguais à média populacional.
+  O erro padrão será zero.
+</p>
+
+</details>
+
+</div>
+
+</section>
+
+<section class="card">
+
+<h2>Sobre os dados</h2>
+
+<p>
+  Os dados reais utilizados neste laboratório são provenientes
+  da Pesquisa Nacional de Saúde de 2019, do IBGE.
+</p>
+
+<p>
+  A base corresponde a um subconjunto didático não ponderado.
+  Os resultados não devem ser interpretados como estimativas
+  representativas da população brasileira.
+</p>
+
+<p>
+  <a href="https://www.ibge.gov.br/estatisticas/sociais/saude/9160-pesquisa-nacional-de-saude.html"
+     target="_blank" rel="noopener noreferrer">
+    Fonte: Pesquisa Nacional de Saúde — IBGE
+  </a>
+</p>
+
+<p>
+  <a href="dados.html">Conheça a base de dados do laboratório</a>
+</p>
+
+</section>
+
+</main>
+
+<footer>
+  BioStat Lab · Laboratório Interativo de Bioestatística
+</footer>
+
+<script>
+
+"use strict";
+
+const $ = id => document.getElementById(id);
+
+let pnsData = null;
+let population = [];
+let simulationResults = null;
+let normalityResult = null;
+let generationVersion = 0;
+
+const COLORS = {
+  green: "#178579",
+  blue: "#426fa9",
+  orange: "#a66b13",
+  purple: "#7957a5",
+  muted: "#536773",
+  border: "#dce5e9"
+};
+
+const fmt = (x, digits = 2) =>
+  Number.isFinite(x)
+    ? x.toLocaleString("pt-BR", {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+      })
+    : "—";
+
+function pFormat(p) {
+  if (!Number.isFinite(p)) return "—";
+  if (p < 0.0001) return "< 0,0001";
+  return fmt(p, 4);
+}
+
+function mean(a) {
+  return a.reduce((s, x) => s + x, 0) / a.length;
+}
+
+function quantile(sorted, p) {
+  const i = (sorted.length - 1) * p;
+  const lo = Math.floor(i);
+  const hi = Math.ceil(i);
+
+  return sorted[lo] +
+    (sorted[hi] - sorted[lo]) * (i - lo);
+}
+
+function statistics(a) {
+
+  const n = a.length;
+
+  if (!n) return null;
+
+  const sorted = [...a].sort((x, y) => x - y);
+  const m = mean(a);
+
+  let m2 = 0;
+  let m3 = 0;
+  let m4 = 0;
+
+  for (const x of a) {
+    const d = x - m;
+    m2 += d ** 2;
+    m3 += d ** 3;
+    m4 += d ** 4;
+  }
+
+  m2 /= n;
+  m3 /= n;
+  m4 /= n;
+
+  const sd = Math.sqrt(m2);
+
+  const sampleSD = n > 1
+    ? Math.sqrt(m2 * n / (n - 1))
+    : NaN;
+
+  let skew = NaN;
+  let kurtosis = NaN;
+
+  if (sd > 0 && n > 2) {
+
+    const g1 = m3 / sd ** 3;
+
+    skew = Math.sqrt(n * (n - 1)) /
+      (n - 2) * g1;
+  }
+
+  if (sd > 0 && n > 3) {
+
+    const g2 = m4 / sd ** 4 - 3;
+
+    kurtosis = (n - 1) /
+      ((n - 2) * (n - 3)) *
+      ((n + 1) * g2 + 6);
+  }
+
+  return {
+    n,
+    mean: m,
+    median: quantile(sorted, 0.5),
+    sd,
+    sampleSD,
+    skew,
+    kurtosis,
+    min: sorted[0],
+    max: sorted[n - 1],
+    sorted
+  };
+}
+
+function normalRandom() {
+
+  const u = 1 - Math.random();
+  const v = Math.random();
+
+  return Math.sqrt(-2 * Math.log(u)) *
+    Math.cos(2 * Math.PI * v);
+}
+
+function normalDensity(x, m, sd) {
+
+  if (!(sd > 0)) return 0;
+
+  const z = (x - m) / sd;
+
+  return Math.exp(-0.5 * z * z) /
+    (sd * Math.sqrt(2 * Math.PI));
+}
+
+function normalTail(x) {
+
+  const z = Math.abs(x);
+  const t = 1 / (1 + 0.2316419 * z);
+
+  const q =
+    Math.exp(-z * z / 2) /
+    Math.sqrt(2 * Math.PI) *
+    t * (
+      0.319381530 +
+      t * (
+        -0.356563782 +
+        t * (
+          1.781477937 +
+          t * (
+            -1.821255978 +
+            t * 1.330274429
+          )
+        )
+      )
+    );
+
+  return x >= 0 ? q : 1 - q;
+}
+
+function inverseNormal(p) {
+
+  if (p <= 0) return -Infinity;
+  if (p >= 1) return Infinity;
+
+  const a = [
+    -39.6968302866538,
+    220.946098424521,
+    -275.928510446969,
+    138.357751867269,
+    -30.6647980661472,
+    2.50662827745924
+  ];
+
+  const b = [
+    -54.4760987982241,
+    161.585836858041,
+    -155.698979859887,
+    66.8013118877197,
+    -13.2806815528857
+  ];
+
+  const c = [
+    -0.00778489400243029,
+    -0.322396458041136,
+    -2.40075827716184,
+    -2.54973253934373,
+    4.37466414146497,
+    2.93816398269878
+  ];
+
+  const d = [
+    0.00778469570904146,
+    0.32246712907004,
+    2.445134137143,
+    3.75440866190742
+  ];
+
+  let q, r;
+
+  if (p < 0.02425) {
+
+    q = Math.sqrt(-2 * Math.log(p));
+
+    return (((((c[0]*q+c[1])*q+c[2])*q+c[3])
+      *q+c[4])*q+c[5]) /
+      ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  }
+
+  if (p > 0.97575) {
+
+    q = Math.sqrt(-2 * Math.log(1-p));
+
+    return -(((((c[0]*q+c[1])*q+c[2])*q+c[3])
+      *q+c[4])*q+c[5]) /
+      ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  }
+
+  q = p - 0.5;
+  r = q * q;
+
+  return (((((a[0]*r+a[1])*r+a[2])*r+a[3])
+    *r+a[4])*r+a[5])*q /
+    (((((b[0]*r+b[1])*r+b[2])*r+b[3])
+    *r+b[4])*r+1);
+}
+
+function metric(label, value) {
+
+  return `<div class="metric">
+    <span>${label}</span>
+    <strong>${value}</strong>
+  </div>`;
+}
+
+function shuffle(a) {
+
+  const copy = [...a];
+
+  for (let i = copy.length - 1; i > 0; i--) {
+
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+
+  return copy;
+}
+
+function simulatedValue(type) {
+
+  const z = normalRandom();
+
+  switch (type) {
+
+    case "normal":
+      return 100 + 15 * z;
+
+    case "right":
+      return 35 + 35 * Math.exp(0.8 * z);
+
+    case "left":
+      return 180 - 35 * Math.exp(0.8 * z);
+
+    case "uniform":
+      return 60 + Math.random() * 80;
+
+    case "bimodal":
+      return (Math.random() < 0.5 ? 75 : 125)
+        + 8 * z;
+
+    case "heavy":
+      return 100 + (
+        Math.random() < 0.9 ? 10 : 45
+      ) * z;
+
+    default:
+      return 100 + 15 * z;
+  }
+}
+
+const distributionNames = {
+  normal: "Normal",
+  right: "Assimétrica à direita",
+  left: "Assimétrica à esquerda",
+  uniform: "Uniforme",
+  bimodal: "Bimodal",
+  heavy: "Mistura normal com caudas pesadas"
+};
+
+function updateControls() {
+
+  const source = $("source").value;
+
+  $("distributionControl").hidden =
+    source !== "simulated";
+
+  $("variableControl").hidden =
+    source !== "pns";
+
+  $("sexControl").hidden =
+    source !== "pns";
+
+  $("sizeControl").hidden =
+    source === "custom";
+
+  $("customControl").hidden =
+    source !== "custom";
+
+  $("generate").hidden =
+    source === "custom";
+}
+
+async function generatePopulation() {
+
+  const version = ++generationVersion;
+
+  $("dataError").textContent = "";
+
+  const source = $("source").value;
+  const N = Number($("populationSize").value);
+
+  let nextPopulation = [];
+  let description = "";
+
+  try {
+
+    if (source === "simulated") {
+
+      const type = $("distribution").value;
+
+      nextPopulation = Array.from(
+        {length: N},
+        () => simulatedValue(type)
+      );
+
+      description =
+        "População simulada: " +
+        distributionNames[type];
+    }
+
+    else if (source === "pns") {
+
+      if (!pnsData) {
+
+        $("populationInfo").textContent =
+          "Carregando dados da PNS...";
+
+        const response =
+          await fetch("dados/pns2019.json");
+
+        if (!response.ok) {
+          throw new Error("HTTP " + response.status);
+        }
+
+        const loaded = await response.json();
+
+        if (!Array.isArray(loaded)) {
+          throw new Error("Formato JSON inválido.");
+        }
+
+        pnsData = loaded;
+      }
+
+      if (version !== generationVersion) return;
+
+      const variable = $("variable").value;
+      const sex = $("sex").value;
+
+      const eligible = pnsData.filter(row =>
+        (sex === "all" || Number(row.sexo) === Number(sex))
+        && Number.isFinite(row[variable])
+      );
+
+      nextPopulation = shuffle(eligible)
+        .slice(0, N)
+        .map(row => row[variable]);
+
+      const variableName =
+        $("variable").selectedOptions[0].textContent;
+
+      const sexName =
+        $("sex").selectedOptions[0].textContent;
+
+      description =
+        `PNS 2019 · ${variableName} · ${sexName}` +
+        ` · ${eligible.length} registros elegíveis`;
+    }
+
+    else {
+
+      const lines = $("customValues").value
+        .split(/[\n;]+/)
+        .map(x => x.trim())
+        .filter(Boolean);
+
+      if (lines.some(x =>
+        !/^[+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+)$/.test(x)
+      )) {
+        throw new Error(
+          "Existe um valor inválido. Utilize um número por linha."
+        );
+      }
+
+      nextPopulation = lines.map(
+        x => Number(x.replace(",", "."))
+      );
+
+      if (nextPopulation.length > 5000) {
+        throw new Error("Limite de 5000 valores.");
+      }
+
+      description = "Dados próprios";
+    }
+
+    if (version !== generationVersion) return;
+
+    if (
+      nextPopulation.length < 3 ||
+      nextPopulation.some(x => !Number.isFinite(x))
+    ) {
+      throw new Error(
+        "São necessários pelo menos três valores numéricos válidos."
+      );
+    }
+
+    population = nextPopulation;
+
+    $("populationInfo").textContent =
+      `${description} · N = ${population.length}`;
+
+    simulationResults = null;
+    normalityResult = null;
+
+    clearDependentResults();
+    renderPopulation();
+    renderNormality();
+    renderTCLPopulation();
+    compareTransformation();
+
+    ["sampleA", "sampleB", "sampleC"].forEach(id => {
+      $(id).max = population.length;
+      $(id).value = Math.max(
+        1,
+        Math.min(
+          population.length,
+          Math.trunc(Number($(id).value)) || 1
+        )
+      );
+    });
+
+  } catch (error) {
+
+    if (version !== generationVersion) return;
+
+    $("dataError").textContent =
+      "Não foi possível atualizar a população: " +
+      error.message;
+
+    $("populationInfo").textContent =
+      "A configuração solicitada não foi aplicada. " +
+      "Os gráficos mantêm a última população válida.";
+  }
+}
+
+function clearDependentResults() {
+
+  [
+    "normalityMetrics",
+    "tclA",
+    "tclB",
+    "tclC",
+    "infoA",
+    "infoB",
+    "infoC",
+    "tclTable",
+    "seChart"
+  ].forEach(id => $(id).innerHTML = "");
+
+  $("normalityInterpretation").textContent =
+    "Clique em calcular teste para explorar os resultados.";
+
+  $("tclStatus").textContent =
+    "Execute o experimento para gerar novas médias amostrais.";
+
+  $("titleA").textContent = "Distribuição das médias — A";
+  $("titleB").textContent = "Distribuição das médias — B";
+  $("titleC").textContent = "Distribuição das médias — C";
+}
+
+function svgWrap(content, label, width = 640, height = 290) {
+
+  return `<svg viewBox="0 0 ${width} ${height}"
+    role="img" aria-label="${label}"
+    xmlns="http://www.w3.org/2000/svg">
+    ${content}
+  </svg>`;
+}
+
+function histogram(
+  data,
+  {
+    bins = 20,
+    curve = false,
+    showMean = false,
+    showMedian = false,
+    domain = null,
+    reference = null,
+    color = COLORS.green,
+    label = "Histograma"
+  } = {}
+) {
+
+  if (!data.length) return "";
+
+  const s = statistics(data);
+
+  let min = domain ? domain[0] : s.min;
+  let max = domain ? domain[1] : s.max;
+
+  if (max === min) {
+    min -= 0.5;
+    max += 0.5;
+  }
+
+  const L = 64;
+  const R = 616;
+  const T = 20;
+  const B = 235;
+
+  const step = (max - min) / bins;
+  const counts = Array(bins).fill(0);
+
+  for (const v of data) {
+
+    if (v < min || v > max) continue;
+
+    const i = Math.min(
+      bins - 1,
+      Math.max(0, Math.floor((v - min) / step))
+    );
+
+    counts[i]++;
+  }
+
+  const percentages = counts.map(
+    c => c / data.length * 100
+  );
+
+  let top = Math.max(...percentages, 1);
+
+  if (curve && s.sd > 0) {
+    top = Math.max(
+      top,
+      normalDensity(s.mean, s.mean, s.sd)
+        * step * 100
+    );
+  }
+
+  top *= 1.12;
+
+  const X = v => L + (v - min) /
+    (max - min) * (R - L);
+
+  const Y = v => B - v / top * (B - T);
+
+  let svg = "";
+
+  for (let i = 0; i <= 4; i++) {
+
+    const yValue = top * i / 4;
+    const y = Y(yValue);
+
+    svg += `
+      <line x1="${L}" y1="${y}"
+            x2="${R}" y2="${y}"
+            stroke="${COLORS.border}"/>
+
+      <text x="${L - 8}" y="${y + 4}"
+            text-anchor="end" font-size="11"
+            fill="${COLORS.muted}">
+        ${fmt(yValue, 1)}%
+      </text>`;
+  }
+
+  const barWidth = (R - L) / bins;
+
+  percentages.forEach((v, i) => {
+
+    const y = Y(v);
+
+    svg += `
+      <rect x="${L + i * barWidth + 0.7}"
+            y="${y}"
+            width="${Math.max(1, barWidth - 1.4)}"
+            height="${B - y}"
+            fill="${color}" opacity="0.8">
+        <title>
+          Frequência: ${counts[i]} (${fmt(v)}%)
+        </title>
+      </rect>`;
+  });
+
+  if (curve && s.sd > 0) {
+
+    const points = [];
+
+    for (let i = 0; i <= 200; i++) {
+
+      const v = min + (max - min) * i / 200;
+
+      const f = normalDensity(
+        v, s.mean, s.sd
+      ) * step * 100;
+
+      points.push(`${X(v)},${Y(f)}`);
+    }
+
+    svg += `<polyline
+      points="${points.join(" ")}"
+      fill="none"
+      stroke="${COLORS.blue}"
+      stroke-width="2.7"/>`;
+  }
+
+  function vertical(value, stroke, dash) {
+
+    if (!Number.isFinite(value) ||
+        value < min || value > max) return "";
+
+    return `<line x1="${X(value)}"
+      x2="${X(value)}"
+      y1="${T}" y2="${B}"
+      stroke="${stroke}"
+      stroke-width="2.5"
+      stroke-dasharray="${dash}"/>`;
+  }
+
+  if (showMean) {
+    svg += vertical(s.mean, COLORS.orange, "7 4");
+  }
+
+  if (showMedian) {
+    svg += vertical(s.median, COLORS.purple, "2 4");
+  }
+
+  if (reference !== null) {
+    svg += vertical(reference, COLORS.orange, "6 4");
+  }
+
+  svg += `<line x1="${L}" y1="${B}"
+    x2="${R}" y2="${B}"
+    stroke="${COLORS.muted}"/>`;
+
+  for (let i = 0; i <= 5; i++) {
+
+    const v = min + (max - min) * i / 5;
+
+    svg += `<text x="${X(v)}" y="${B + 20}"
+      text-anchor="middle" font-size="11"
+      fill="${COLORS.muted}">${fmt(v, 1)}</text>`;
+  }
+
+  svg += `<text x="${(L + R) / 2}" y="281"
+    text-anchor="middle" font-size="12"
+    fill="${COLORS.muted}">Valores</text>`;
+
+  return svgWrap(svg, label);
+}
+
+function renderPopulation() {
+
+  if (!population.length) return;
+
+  const s = statistics(population);
+  const bins = Number($("bins").value);
+
+  $("binsValue").textContent = bins;
+
+  $("descriptiveMetrics").innerHTML =
+    metric("N", s.n) +
+    metric("Média", fmt(s.mean)) +
+    metric("Mediana", fmt(s.median)) +
+    metric("DP populacional", fmt(s.sd)) +
+    metric("Assimetria ajustada", fmt(s.skew)) +
+    metric("Excesso de curtose", fmt(s.kurtosis)) +
+    metric("Mínimo", fmt(s.min)) +
+    metric("Máximo", fmt(s.max));
+
+  $("populationChart").innerHTML =
+    histogram(population, {
+      bins,
+      curve: $("showNormal").checked,
+      showMean: $("showMean").checked,
+      showMedian: $("showMedian").checked,
+      label: "Distribuição dos valores individuais"
+    });
+
+  let interpretation;
+
+  if (s.sd === 0) {
+
+    interpretation =
+      "Todos os valores são iguais. Não existe dispersão.";
+  }
+
+  else if (s.skew > 0.5) {
+
+    interpretation =
+      "A assimetria positiva sugere uma cauda mais longa " +
+      "à direita. Observe se valores elevados deslocam a média.";
+  }
+
+  else if (s.skew < -0.5) {
+
+    interpretation =
+      "A assimetria negativa sugere uma cauda mais longa " +
+      "à esquerda. Observe a relação entre média e mediana.";
+  }
+
+  else {
+
+    interpretation =
+      "A assimetria está relativamente próxima de zero. " +
+      "Isso sugere simetria aproximada, mas não comprova normalidade.";
+  }
+
+  $("shapeInterpretation").textContent =
+    interpretation +
+    " Os limites de ±0,5 são referências didáticas, " +
+    "não critérios formais de classificação.";
+}
+
+function renderNormalCurve() {
+
+  const m = Number($("normalMean").value);
+  const sd = Number($("normalSD").value);
+  const k = Number($("normalRegion").value);
+
+  $("normalMeanValue").textContent = m;
+  $("normalSDValue").textContent = sd;
+
+  const probabilities = {
+    1: 68.268949,
+    2: 95.449974,
+    3: 99.730020
+  };
+
+  const lo = m - k * sd;
+  const hi = m + k * sd;
+
+  $("normalMetrics").innerHTML =
+    metric("Limite inferior", fmt(lo)) +
+    metric("Limite superior", fmt(hi)) +
+    metric("Probabilidade", fmt(probabilities[k]) + "%");
+
+  const min = -60;
+  const max = 260;
+
+  const L = 40;
+  const R = 615;
+  const T = 20;
+  const B = 235;
+
+  const top = normalDensity(0, 0, 3) * 1.05;
+
+  const X = x => L + (x - min) /
+    (max - min) * (R - L);
+
+  const Y = y => B - y / top * (B - T);
+
+  let path = [];
+  let area = [`${X(lo)},${B}`];
+
+  for (let i = 0; i <= 500; i++) {
+
+    const x = min + (max - min) * i / 500;
+
+    path.push(
+      `${X(x)},${Y(normalDensity(x, m, sd))}`
+    );
+  }
+
+  for (let i = 0; i <= 150; i++) {
+
+    const x = lo + (hi - lo) * i / 150;
+
+    area.push(
+      `${X(x)},${Y(normalDensity(x, m, sd))}`
+    );
+  }
+
+  area.push(`${X(hi)},${B}`);
+
+  let svg = `<polygon points="${area.join(" ")}"
+    fill="${COLORS.green}" opacity="0.35"/>`;
+
+  svg += `<polyline points="${path.join(" ")}"
+    fill="none" stroke="${COLORS.green}"
+    stroke-width="3"/>`;
+
+  svg += `<line x1="${L}" y1="${B}"
+    x2="${R}" y2="${B}"
+    stroke="${COLORS.muted}"/>`;
+
+  for (let i = -3; i <= 3; i++) {
+
+    const x = m + i * sd;
+
+    svg += `<line x1="${X(x)}" x2="${X(x)}"
+      y1="${Y(normalDensity(x, m, sd))}"
+      y2="${B}" stroke="${COLORS.muted}"
+      stroke-dasharray="4 4" opacity="0.6"/>`;
+
+    svg += `<text x="${X(x)}" y="${B + 18}"
+      font-size="10" text-anchor="middle"
+      fill="${COLORS.muted}">
+      ${i === 0 ? "μ" : i > 0 ? "+" + i + "σ" : i + "σ"}
+    </text>`;
+  }
+
+  svg += `<text x="${(L + R) / 2}" y="280"
+    font-size="12" text-anchor="middle"
+    fill="${COLORS.muted}">
+    Média = ${m} · DP = ${sd}
+  </text>`;
+
+  $("normalChart").innerHTML =
+    svgWrap(svg, "Curva normal teórica");
+}
+
+function qqPlot(data) {
+
+  const s = statistics(data);
+
+  if (!s || s.sd === 0) {
+
+    return "<p>Gráfico Q-Q indisponível: variância zero.</p>";
+  }
+
+  const observed = s.sorted.map(
+    x => (x - s.mean) / s.sampleSD
+  );
+
+  const theoretical = observed.map(
+    (_, i) => inverseNormal(
+      (i + 1 - 0.375) / (observed.length + 0.25)
+    )
+  );
+
+  const bound = Math.max(
+    3.5,
+    ...observed.map(Math.abs),
+    ...theoretical.map(Math.abs)
+  ) * 1.05;
+
+  const L = 65;
+  const R = 615;
+  const T = 20;
+  const B = 235;
+
+  const X = x => L + (x + bound) /
+    (2 * bound) * (R - L);
+
+  const Y = y => B - (y + bound) /
+    (2 * bound) * (B - T);
+
+  let svg = "";
+
+  for (let i = 0; i <= 4; i++) {
+
+    const v = -bound + 2 * bound * i / 4;
+
+    svg += `<line x1="${X(v)}" y1="${T}"
+      x2="${X(v)}" y2="${B}"
+      stroke="${COLORS.border}"/>`;
+
+    svg += `<line x1="${L}" y1="${Y(v)}"
+      x2="${R}" y2="${Y(v)}"
+      stroke="${COLORS.border}"/>`;
+
+    svg += `<text x="${X(v)}" y="${B + 18}"
+      text-anchor="middle" font-size="11">
+      ${fmt(v, 1)}
+    </text>`;
+
+    svg += `<text x="${L - 8}" y="${Y(v) + 4}"
+      text-anchor="end" font-size="11">
+      ${fmt(v, 1)}
+    </text>`;
+  }
+
+  svg += `<line x1="${X(-bound)}" y1="${Y(-bound)}"
+    x2="${X(bound)}" y2="${Y(bound)}"
+    stroke="${COLORS.orange}" stroke-width="2"
+    stroke-dasharray="6 4"/>`;
+
+  observed.forEach((v, i) => {
+
+    svg += `<circle cx="${X(theoretical[i])}"
+      cy="${Y(v)}" r="${observed.length > 500 ? 2 : 3}"
+      fill="${COLORS.green}" opacity="0.65"/>`;
+  });
+
+  svg += `<text x="${(L + R) / 2}" y="280"
+    text-anchor="middle" font-size="12">
+    Quantis teóricos normais
+  </text>`;
+
+  svg += `<text x="14" y="${(T + B) / 2}"
+    transform="rotate(-90 14 ${(T + B) / 2})"
+    text-anchor="middle" font-size="12">
+    Quantis observados padronizados
+  </text>`;
+
+  return svgWrap(svg, "Gráfico Q-Q de normalidade");
+}
+
+function renderNormality() {
+
+  if (!population.length) return;
+
+  const s = statistics(population);
+
+  $("normalityHistogram").innerHTML =
+    histogram(population, {
+      bins: Number($("bins").value),
+      curve: true,
+      showMean: true
+    });
+
+  $("qqChart").innerHTML = qqPlot(population);
+
+  const expected = [68.268949, 95.449974, 99.730020];
+
+  $("empiricalTable").innerHTML =
+    [1, 2, 3].map((k, i) => {
+
+      const observed = s.sd > 0
+        ? population.filter(
+            x => Math.abs(x - s.mean) <= k * s.sd
+          ).length / s.n * 100
+        : NaN;
+
+      return `<tr>
+        <td>Média ± ${k} DP</td>
+        <td>${Number.isFinite(observed)
+          ? fmt(observed) + "%"
+          : "Indefinido"}</td>
+        <td>${fmt(expected[i])}%</td>
+      </tr>`;
+
+    }).join("");
+}
+
+function polynomial(coefficients, x) {
+
+  return coefficients.reduceRight(
+    (result, c) => result * x + c, 0
+  );
+}
+
+/*
+  Shapiro-Wilk:
+  aproximação de Royston, baseada no algoritmo AS R94.
+
+  Implementação experimental.
+  Faixa utilizada: 3 a 5000 observações.
+*/
+
+function shapiroWilk(data) {
+
+  const n = data.length;
+
+  if (n < 3 || n > 5000) {
+    return {error: "O teste requer entre 3 e 5000 valores."};
+  }
+
+  const s = statistics(data);
+
+  if (!(s.sd > 0)) {
+    return {error: "Não é possível testar dados constantes."};
+  }
+
+  const x = s.sorted.map(
+    v => (v - s.mean) / s.sd
+  );
+
+  const half = Math.floor(n / 2);
+  const a = [];
+
+  if (n === 3) {
+
+    a.push(Math.SQRT1_2);
+
+  } else {
+
+    for (let i = 0; i < half; i++) {
+
+      a.push(
+        -inverseNormal(
+          (i + 1 - 0.375) / (n + 0.25)
+        )
+      );
+    }
+
+    const sumSquares =
+      2 * a.reduce((sum, v) => sum + v * v, 0);
+
+    const norm = Math.sqrt(sumSquares);
+    const rsn = 1 / Math.sqrt(n);
+
+    const c1 = [
+      0, 0.221157, -0.147981,
+      -2.07119, 4.434685, -2.706056
+    ];
+
+    const c2 = [
+      0, 0.042981, -0.293762,
+      -1.752461, 5.682633, -3.582633
+    ];
+
+    const a1 =
+      polynomial(c1, rsn) + a[0] / norm;
+
+    let factor;
+    let start;
+
+    if (n > 5) {
+
+      const a2 =
+        polynomial(c2, rsn) + a[1] / norm;
+
+      factor = Math.sqrt(
+        (sumSquares - 2 * a[0] ** 2 - 2 * a[1] ** 2) /
+        (1 - 2 * a1 ** 2 - 2 * a2 ** 2)
+      );
+
+      a[1] = a2;
+      start = 2;
+
+    } else {
+
+      factor = Math.sqrt(
+        (sumSquares - 2 * a[0] ** 2) /
+        (1 - 2 * a1 ** 2)
+      );
+
+      start = 1;
+    }
+
+    a[0] = a1;
+
+    for (let i = start; i < half; i++) {
+      a[i] /= factor;
+    }
+  }
+
+  let numerator = 0;
+
+  for (let i = 0; i < half; i++) {
+
+    numerator += a[i] *
+      (x[n - 1 - i] - x[i]);
+  }
+
+  const denominator =
+    x.reduce((sum, v) => sum + v * v, 0);
+
+  let W = numerator ** 2 / denominator;
+
+  W = Math.max(0, Math.min(1, W));
+
+  let p;
+
+  if (n === 3) {
+
+    p = 1 - (6 / Math.PI) *
+      Math.acos(Math.sqrt(Math.max(0.75, W)));
+
+  } else {
+
+    let y = Math.log(Math.max(1e-16, 1 - W));
+
+    let m;
+    let sd;
+
+    if (n <= 11) {
+
+      const gamma = -2.273 + 0.459 * n;
+
+      if (y >= gamma) {
+
+        return {W, p: 1e-16};
+
+      }
+
+      y = -Math.log(gamma - y);
+
+      m = polynomial(
+        [0.5440, -0.39978, 0.025054, -0.0006714],
+        n
+      );
+
+      sd = Math.exp(
+        polynomial(
+          [1.3822, -0.77857, 0.062767, -0.0020322],
+          n
+        )
+      );
+
+    } else {
+
+      const logN = Math.log(n);
+
+      m = polynomial(
+        [-1.5861, -0.31082, -0.083751, 0.0038915],
+        logN
+      );
+
+      sd = Math.exp(
+        polynomial(
+          [-0.4803, -0.082676, 0.0030302],
+          logN
+        )
+      );
+    }
+
+    p = normalTail((y - m) / sd);
+  }
+
+  return {
+    W,
+    p: Math.max(0, Math.min(1, p))
+  };
+}
+
+function runNormality() {
+
+  if (!population.length) return;
+
+  normalityResult = shapiroWilk(population);
+
+  displayNormalityResult();
+}
+
+function displayNormalityResult() {
+
+  if (!normalityResult) return;
+
+  const result = normalityResult;
+
+  if (result.error) {
+
+    $("normalityMetrics").innerHTML = "";
+
+    $("normalityInterpretation").textContent =
+      result.error;
+
+    return;
+  }
+
+  const alpha = Number($("alpha").value);
+
+  $("normalityMetrics").innerHTML =
+    metric("N", population.length) +
+    metric("Estatística W", fmt(result.W, 5)) +
+    metric("p-valor aproximado", pFormat(result.p)) +
+    metric("Significância", fmt(alpha * 100, 0) + "%");
+
+  if (!Number.isFinite(result.p)) {
+
+    $("normalityInterpretation").textContent =
+      "Resultado numérico indisponível.";
+
+  } else if (result.p < alpha) {
+
+    $("normalityInterpretation").textContent =
+      "Resultado exploratório: rejeição da hipótese " +
+      "de normalidade no nível de significância selecionado. " +
+      "Observe também o histograma e o gráfico Q-Q.";
+
+  } else {
+
+    $("normalityInterpretation").textContent =
+      "Resultado exploratório: não há evidência suficiente " +
+      "para rejeitar a hipótese de normalidade. " +
+      "Isso não comprova que a distribuição seja normal.";
+  }
+}
+
+function compareTransformation() {
+
+  if (!population.length) return;
+
+  const type = $("transformation").value;
+
+  const eligible = population.filter(x => {
+
+    if (type === "log") return x > 0;
+    if (type === "log1p") return x > -1;
+
+    return x >= 0;
+  });
+
+  const transformed = eligible.map(x => {
+
+    if (type === "log") return Math.log(x);
+    if (type === "log1p") return Math.log1p(x);
+
+    return Math.sqrt(x);
+  });
+
+  const excluded = population.length - eligible.length;
+
+  if (!eligible.length) {
+
+    $("originalChart").innerHTML = "";
+    $("transformedChart").innerHTML = "";
+    $("originalStats").innerHTML = "";
+    $("transformedStats").innerHTML = "";
+
+    $("transformInfo").textContent =
+      "Nenhum valor é compatível com a transformação escolhida.";
+
+    return;
+  }
+
+  const a = statistics(eligible);
+  const b = statistics(transformed);
+
+  $("originalChart").innerHTML =
+    histogram(eligible, {curve: true});
+
+  $("transformedChart").innerHTML =
+    histogram(transformed, {
+      curve: true,
+      color: COLORS.blue
+    });
+
+  $("originalStats").textContent =
+    `Assimetria: ${fmt(a.skew)} · ` +
+    `Excesso de curtose: ${fmt(a.kurtosis)}`;
+
+  $("transformedStats").textContent =
+    `Assimetria: ${fmt(b.skew)} · ` +
+    `Excesso de curtose: ${fmt(b.kurtosis)}`;
+
+  $("transformInfo").textContent =
+    `${eligible.length} valores comparados nos dois gráficos. ` +
+    `${excluded} valores excluídos por incompatibilidade ` +
+    `com o domínio da transformação. ` +
+    `A população original não foi alterada.`;
+}
+
+function drawSampleMean(data, n, method, populationMean) {
+
+  const N = data.length;
+
+  let sum = 0;
+
+  if (method === "replacement") {
+
+    for (let i = 0; i < n; i++) {
+
+      sum += data[Math.floor(Math.random() * N)];
+    }
+
+  } else {
+
+    if (n === N) return populationMean;
+
+    const indices = new Map();
+
+    for (let i = 0; i < n; i++) {
+
+      const j = i + Math.floor(
+        Math.random() * (N - i)
+      );
+
+      const chosen = indices.get(j) ?? j;
+      const current = indices.get(i) ?? i;
+
+      indices.set(j, current);
+
+      sum += data[chosen];
+    }
+  }
+
+  return sum / n;
+}
+
+function theoreticalSE(n, method, s) {
+
+  if (method === "replacement") {
+
+    return s.sd / Math.sqrt(n);
+  }
+
+  return s.sampleSD / Math.sqrt(n) *
+    Math.sqrt(Math.max(0, 1 - n / s.n));
+}
+
+function renderTCLPopulation() {
+
+  if (!population.length) return;
+
+  const s = statistics(population);
+
+  $("tclPopulation").innerHTML =
+    histogram(population, {
+      bins: 25,
+      showMean: true
+    });
+
+  $("tclPopulationInfo").textContent =
+    `N = ${s.n} · Média = ${fmt(s.mean)} · ` +
+    `DP populacional = ${fmt(s.sd)}`;
+}
+
+function runTCL() {
+
+  if (!population.length) return;
+
+  const N = population.length;
+  const s = statistics(population);
+
+  const method = $("samplingMethod").value;
+  const repetitions = Number($("repetitions").value);
+
+  const sizes = ["sampleA", "sampleB", "sampleC"].map(id => {
+
+    const n = Math.max(
+      1,
+      Math.min(
+        N,
+        Math.trunc(Number($(id).value)) || 1
+      )
+    );
+
+    $(id).value = n;
+
+    return n;
+  });
+
+  $("runTCL").disabled = true;
+
+  $("tclStatus").textContent =
+    "Sorteando amostras independentes...";
+
+  const version = generationVersion;
+  const data = [...population];
+
+  setTimeout(() => {
+
+    try {
+
+      if (version !== generationVersion) return;
+
+      simulationResults = sizes.map(n => {
+
+        const values = Array.from(
+          {length: repetitions},
+          () => drawSampleMean(data, n, method, s.mean)
+        );
+
+        const result = statistics(values);
+
+        return {
+          n,
+          values,
+          mean: result.mean,
+          observedSE: result.sampleSD,
+          theoreticalSE: theoreticalSE(n, method, s)
+        };
+      });
+
+      renderTCLResults();
+
+      $("tclStatus").textContent =
+        `Experimento concluído: ${repetitions.toLocaleString("pt-BR")} ` +
+        `amostras para cada tamanho amostral. ` +
+        (method === "replacement"
+          ? "Amostragem com reposição."
+          : "Amostragem sem reposição dentro de cada amostra.");
+
+    } catch (error) {
+
+      $("tclStatus").textContent =
+        "Erro durante a simulação: " + error.message;
+
+    } finally {
+
+      $("runTCL").disabled = false;
+    }
+
+  }, 30);
+}
+
+function renderTCLResults() {
+
+  if (!simulationResults) return;
+
+  const s = statistics(population);
+
+  const common = $("samplingScale").value === "common";
+
+  const allMeans = simulationResults.flatMap(
+    r => r.values
+  );
+
+  const domain = common
+    ? [
+        Math.min(s.min, ...allMeans),
+        Math.max(s.max, ...allMeans)
+      ]
+    : null;
+
+  $("tclPopulation").innerHTML =
+    histogram(population, {
+      bins: 25,
+      domain,
+      reference: s.mean
+    });
+
+  simulationResults.forEach((result, i) => {
+
+    const letter = ["A", "B", "C"][i];
+
+    $("title" + letter).textContent =
+      `Distribuição das médias — n = ${result.n}`;
+
+    $("tcl" + letter).innerHTML =
+      histogram(result.values, {
+        bins: 25,
+        domain,
+        reference: s.mean,
+        curve: true,
+        color: COLORS.blue,
+        label: `Distribuição das médias com n = ${result.n}`
+      });
+
+    $("info" + letter).textContent =
+      `Média das médias: ${fmt(result.mean)} · ` +
+      `Erro padrão observado: ${fmt(result.observedSE)}`;
+  });
+
+  $("tclTable").innerHTML =
+    simulationResults.map(r => `
+      <tr>
+        <td>${r.n}</td>
+        <td>${fmt(r.mean)}</td>
+        <td>${fmt(r.observedSE, 3)}</td>
+        <td>${fmt(r.theoreticalSE, 3)}</td>
+      </tr>
+    `).join("");
+
+  renderSEChart();
+}
+
+function renderSEChart() {
+
+  if (!simulationResults) return;
+
+  const s = statistics(population);
+
+  const items = [
+    {
+      label: "DP populacional",
+      value: s.sd,
+      color: COLORS.green
+    },
+    ...simulationResults.map(r => ({
+      label: `EP observado · n = ${r.n}`,
+      value: r.observedSE,
+      color: COLORS.blue
+    }))
+  ];
+
+  const top = Math.max(
+    ...items.map(item => item.value),
+    0.00001
+  );
+
+  let svg = "";
+
+  items.forEach((item, i) => {
+
+    const y = 25 + i * 52;
+    const width = item.value / top * 340;
+
+    svg += `<text x="10" y="${y + 17}"
+      font-size="12" fill="${COLORS.muted}">
+      ${item.label}
+    </text>`;
+
+    svg += `<rect x="190" y="${y}"
+      width="${width}" height="26"
+      rx="3" fill="${item.color}"/>`;
+
+    svg += `<text x="${195 + width}" y="${y + 17}"
+      font-size="12" fill="${COLORS.muted}">
+      ${fmt(item.value)}
+    </text>`;
+  });
+
+  $("seChart").innerHTML =
+    svgWrap(
+      svg,
+      "Comparação entre desvio padrão e erros padrão",
+      640,
+      245
+    );
+}
+
+$("source").addEventListener("change", () => {
+
+  updateControls();
+
+  if ($("source").value !== "custom") {
+
+    generatePopulation();
+
+  } else {
+
+    generationVersion++;
+
+    $("populationInfo").textContent =
+      "Insira seus dados e clique em utilizar estes dados. " +
+      "Os gráficos mantêm a última população válida até a confirmação.";
+  }
+});
+
+[
+  "distribution",
+  "variable",
+  "sex",
+  "populationSize"
+].forEach(id => {
+
+  $(id).addEventListener("change", generatePopulation);
+});
+
+$("generate").addEventListener(
+  "click", generatePopulation
+);
+
+$("applyCustom").addEventListener(
+  "click", generatePopulation
+);
+
+[
+  "bins",
+  "showNormal",
+  "showMean",
+  "showMedian"
+].forEach(id => {
+
+  $(id).addEventListener("input", () => {
+
+    renderPopulation();
+    renderNormality();
+  });
+});
+
+[
+  "normalMean",
+  "normalSD",
+  "normalRegion"
+].forEach(id => {
+
+  $(id).addEventListener(
+    "input", renderNormalCurve
+  );
+});
+
+$("runNormality").addEventListener(
+  "click", runNormality
+);
+
+$("alpha").addEventListener(
+  "change", displayNormalityResult
+);
+
+$("transform").addEventListener(
+  "click", compareTransformation
+);
+
+$("transformation").addEventListener(
+  "change", compareTransformation
+);
+
+$("runTCL").addEventListener(
+  "click", runTCL
+);
+
+$("samplingScale").addEventListener(
+  "change", renderTCLResults
+);
+
+updateControls();
+renderNormalCurve();
+generatePopulation();
+
+</script>
+
+</body>
+</html>
